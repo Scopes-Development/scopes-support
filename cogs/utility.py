@@ -2,7 +2,9 @@ import discord
 from discord.ext import commands
 from discord_slash import SlashCommand
 from discord_slash import cog_ext
-import json
+from main import *
+from discord.ext.commands import cooldown, BucketType
+from discord.ext.commands import CommandOnCooldown
 
 guild_id = [774402229737488385]
 
@@ -31,6 +33,33 @@ class Rules(commands.Cog):
         embed.set_thumbnail(
             url="https://cdn.discordapp.com/icons/582928406794993664/a_61b8630f5f0759d8d24c74259940c9e5.gif?size=4096")
         await ctx.send(embed=embed)
+
+    submit_options = [
+        {
+            "name": "name",
+            "description": "Name of the bot",
+            "type": 3,
+            "required": "true"
+        },
+        {
+            "name": "description",
+            "description": "Describe your idea as much as possible so we can give the closest result to your vision",
+            "type": 3,
+            "required": "true"
+        }
+    ]
+
+    @cog_ext.cog_slash(name="submit", guild_ids=guild_id, description="Submit your bot idea and we will make it happen!", options=submit_options)
+    async def submit(self, ctx, name, description):
+        code = add_idea(ctx.author.id, name, description)
+        embed = discord.Embed(
+            color=ctx.author.color, title=f"Idea #{code}", description=f"Submitted by : {ctx.author} ({ctx.author.id})")
+        embed.add_field(name=name, value=description)
+        embed.set_thumbnail(url=ctx.author.avatar_url)
+        ch = self.bot.get_channel(854136124423405608)
+        await ch.send(embed=embed)
+
+        await ctx.send(f"Your bot idea has been submitted to us! The idea's ID : {code}", delete_after=5)
 
 
 def setup(bot):
