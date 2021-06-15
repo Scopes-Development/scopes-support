@@ -84,7 +84,79 @@ class Rules(commands.Cog):
             bot = get_bot(bot_id)
 
             embed.add_field(name=f"{self.bot.get_user(bot_id)} [{bot['prefix']}help]",
-                            value=f"Made by **{self.bot.get_user(bot['dev'])}**\nCreated on : {bot['date']}\nAbout : {bot['about']}", inline=False)
+                            value=f"Made by **{self.bot.get_user(bot['dev'])}** | Created on : `{bot['date']}`\n> **About**\n{bot['about']}", inline=False)
+
+        await ctx.send(embed=embed)
+
+    add_options = [
+        {
+            "name": "bot_id",
+            "description": "ID of the bot",
+            "type": 3,
+            "required": "true"
+        },
+        {
+            "name": "developer",
+            "description": "Mention the bot's developer",
+            "type": 6,
+            "required": "true"
+        },
+        {
+            "name": "about",
+            "description": "Introduction/information about the bot",
+            "type": 3,
+            "required": "true"
+        },
+        {
+            "name": "creation_date",
+            "description": "When was the bot created",
+            "type": 3,
+            "required": "true"
+        },
+        {
+            "name": "prefix",
+            "description": "The bot's default prefix",
+            "type": 3,
+            "required": "true"
+        }
+    ]
+
+    @cog_ext.cog_slash(name="addbot", guild_ids=guild_id, description="Add a new bot to Scopes Development's bots", options=add_options)
+    @commands.has_role(781239888736944188)
+    async def addbot(self, ctx, bots_id, developer: discord.Member, about, date, prefix):
+        bot_id = int(bots_id)
+        dev_role = ctx.guild.get_role(803680355022274640)
+        bot = ctx.guild.get_member(bot_id)
+
+        if dev_role in developer.roles:
+            pass
+        else:
+            developer.add_roles(dev_role)
+
+        for role in bot.roles:
+            if role.name == bot.name:
+                continue
+
+            if role.name == "@everyone":
+                continue
+
+            await bot.remove_roles(role)
+
+        new_roles = [789061944689950722,
+                     774406338218164255, 774406153584508988]
+
+        for x in new_roles:
+            role = ctx.guild.get_role(x)
+
+            await bot.add_roles(role)
+
+        add_bot(bot.id, about, developer.id, date, prefix)
+
+        embed = discord.Embed(
+            color=bot.color, title=f"{bot.name} has been added to Scopes Development's bots!", description=f"Made by **{developer}**\nCreated on : {date}\nAbout : {about}")
+
+        embed.set_author(
+            name=f"{bot.name} [{prefix}help]", icon_url=bot.avatar_url)
 
         await ctx.send(embed=embed)
 
