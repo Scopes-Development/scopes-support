@@ -78,13 +78,14 @@ class Rules(commands.Cog):
 
         embed = discord.Embed(
             color=ctx.author.color, description="All the bots made by Scopes Development's <@&803680355022274640>")
-        embed.set_author(name="Our Bots", icon_url=ctx.guild.icon_url)
+        embed.set_author(name="Scopes Development's bots",
+                         icon_url=ctx.guild.icon_url)
 
         for bot_id in list:
             bot = get_bot(bot_id)
 
             embed.add_field(name=f"{self.bot.get_user(bot_id)} [{bot['prefix']}help]",
-                            value=f"Made by **{self.bot.get_user(bot['dev'])}** | Created on : `{bot['date']}`\n> **About**\n{bot['about']}", inline=False)
+                            value=f"Made by **{self.bot.get_user(bot['dev'])}** | Created on : `{bot['date']}`\n[Invite link]({bot['invite']} 'Invite {self.bot.get_user(bot_id).name} to your server by clicking here!')\n\n> **About**\n{bot['about']}", inline=False)
 
         await ctx.send(embed=embed)
 
@@ -118,12 +119,18 @@ class Rules(commands.Cog):
             "description": "The bot's default prefix",
             "type": 3,
             "required": "true"
+        },
+        {
+            "name": "invite_url",
+            "description": "The bot's invite link",
+            "type": 3,
+            "required": "true"
         }
     ]
 
     @cog_ext.cog_slash(name="addbot", guild_ids=guild_id, description="Add a new bot to Scopes Development's bots", options=add_options)
     @commands.has_role(781239888736944188)
-    async def addbot(self, ctx, bots_id, developer: discord.Member, about, date, prefix):
+    async def addbot(self, ctx, bots_id, developer: discord.Member, about, date, prefix, invite):
         bot_id = int(bots_id)
         dev_role = ctx.guild.get_role(803680355022274640)
         bot = ctx.guild.get_member(bot_id)
@@ -150,7 +157,7 @@ class Rules(commands.Cog):
 
             await bot.add_roles(role)
 
-        add_bot(bot.id, about, developer.id, date, prefix)
+        add_bot(bot.id, about, developer.id, date, prefix, invite)
 
         embed = discord.Embed(
             color=bot.color, title=f"{bot.name} has been added to Scopes Development's bots!", description=f"Made by **{developer}**\nCreated on : {date}\nAbout : {about}")
