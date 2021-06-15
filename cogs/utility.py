@@ -61,6 +61,33 @@ class Rules(commands.Cog):
 
         await ctx.send(f"Your bot idea has been submitted to us! The idea's ID : {code}", delete_after=5)
 
+    @cog_ext.cog_slash(name="devs", guild_ids=guild_id, description="View a list of our developers")
+    async def devs(self, ctx):
+        embed = discord.Embed(color=ctx.author.color)
+        role = ctx.guild.get_role(803680355022274640)
+
+        for member in role.members:
+            embed.add_field(
+                name=member.name, value=f"ID : `{member.id}`\nUser : `{member}`", inline=False)
+
+        await ctx.send(embed=embed)
+
+    @cog_ext.cog_slash(name="bots", guild_ids=guild_id, description="View a list of our bots")
+    async def bots(self, ctx):
+        list = bots_list()
+
+        embed = discord.Embed(
+            color=ctx.author.color, description="All the bots made by Scopes Development's <@&803680355022274640>")
+        embed.set_author(name="Our Bots", icon_url=ctx.guild.icon_url)
+
+        for bot_id in list:
+            bot = get_bot(bot_id)
+
+            embed.add_field(name=f"{self.bot.get_user(bot_id)} [{bot['prefix']}help]",
+                            value=f"Made by **{self.bot.get_user(bot['dev'])}**\nCreated on : {bot['date']}\nAbout : {bot['about']}", inline=False)
+
+        await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Rules(bot))
